@@ -2,11 +2,9 @@ import { defineConfig } from 'vitest/config';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { cloudflare } from '@cloudflare/vite-plugin';
 
 export default defineConfig({
 	plugins: [
-		cloudflare({ configPath: './wrangler.jsonc', persistState: true }),
 		tailwindcss(),
 		sveltekit({
 			compilerOptions: {
