@@ -100,7 +100,8 @@ export class WatcherAgent extends Agent<Env, WatcherState> {
 					assumptionStatement: match.statement,
 					evidenceText,
 					evidenceRef,
-					verdict: result
+					verdict: result,
+					ambiguousChannelId: this.env.AMBIGUOUS_ALERTS_CHANNEL_ID
 				});
 			}
 		}

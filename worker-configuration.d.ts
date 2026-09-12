@@ -17,6 +17,7 @@ interface __BaseEnv_Env {
 	CLOUDFLARE_DATABASE_ID: string;
 	CLOUDFLARE_D1_TOKEN: string;
 	AMBIGUOUS_API_KEY: string;
+	AMBIGUOUS_ALERTS_CHANNEL_ID: string;
 	Extractor: DurableObjectNamespace /* ExtractorAgent */;
 	Watcher: DurableObjectNamespace /* WatcherAgent */;
 	Evaluator: DurableObjectNamespace /* EvaluatorAgent */;
