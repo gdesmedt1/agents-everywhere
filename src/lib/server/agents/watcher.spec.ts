@@ -1,7 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- test stubs `state`/`setState` on the Agent
    prototype without a live Durable Object ctx/env (see note below); every agent test in this plan
    uses this same pattern. */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// `agents` imports `cloudflare:workers` at module top level, which does not exist
+// outside the actual Workers runtime — this repo's Vitest runs `environment: 'node'`
+// (no `@cloudflare/vitest-pool-workers`, out of scope per Global Constraints), so
+// importing anything from a file that imports the real `agents` package crashes
+// immediately at import time, before any test runs. Mocking the module with a plain
+// class avoids that crash entirely.
+vi.mock('agents', () => ({
+	Agent: class {},
+	callable: () => (_target: unknown, _key: unknown, descriptor: PropertyDescriptor) => descriptor
+}));
+
 import { WatcherAgent } from './watcher';
 
 describe('WatcherAgent.registerAssumption', () => {
