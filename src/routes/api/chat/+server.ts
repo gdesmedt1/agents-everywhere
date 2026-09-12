@@ -4,6 +4,15 @@ import { env } from '$env/dynamic/private';
 import { runEverywhereAgent } from '$lib/server/agent';
 import { getDb } from '$lib/server/db';
 import { actionDraft } from '$lib/server/db/schema';
+import { looksLikeDecision } from '$lib/server/decision-heuristic';
+import { getAgentByName } from '$lib/server/get-agent-by-name';
+
+type ExtractorStub = {
+	extract: (message: string) => Promise<{
+		decision: { id: string; statement: string };
+		assumptions: { id: string; statement: string }[];
+	}>;
+};
 
 export const POST: RequestHandler = async (event) => {
 	if (!event.locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -12,6 +21,24 @@ export const POST: RequestHandler = async (event) => {
 
 	const body = (await event.request.json()) as { message?: string };
 	if (!body.message?.trim()) return json({ error: 'message required' }, { status: 400 });
+
+	if (looksLikeDecision(body.message)) {
+		const workersEnv = event.platform?.env;
+		if (!workersEnv) return json({ error: 'Workers platform unavailable' }, { status: 500 });
+		try {
+			const decisionId = crypto.randomUUID();
+			const extractor = await getAgentByName<ExtractorStub>(workersEnv.Extractor, decisionId);
+			const { decision, assumptions } = await extractor.extract(body.message);
+			return json({
+				text: `I found a decision with ${assumptions.length} condition(s) that appear important. Should I track them?`,
+				decision,
+				assumptions
+			});
+		} catch (err) {
+			const message = err instanceof Error ? err.message : 'Extraction failed';
+			return json({ error: message }, { status: 500 });
+		}
+	}
 
 	try {
 		const result = await runEverywhereAgent({

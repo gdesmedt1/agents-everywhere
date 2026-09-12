@@ -20,11 +20,20 @@
 		}
 	],
 	"vars": {
-		"ORIGIN": "https://my.assumption-alarm.workers.dev",
-		"OPENAI_API_KEY": "",
-		"OPENAI_CHATKIT_WORKFLOW_ID": "",
-		"OPENAI_CHATKIT_DOMAIN_KEY": "domain_pk_localhost",
-		"TELEGRAM_BOT_TOKEN": "",
-		"TELEGRAM_WEBHOOK_SECRET": ""
-	}
+		"ORIGIN": "https://my.assumption-alarm.workers.dev"
+	},
+	"durable_objects": {
+		"bindings": [
+			{ "name": "Extractor", "class_name": "ExtractorAgent" },
+			{ "name": "Watcher", "class_name": "WatcherAgent" },
+			{ "name": "Evaluator", "class_name": "EvaluatorAgent" },
+			{ "name": "Notifier", "class_name": "NotifierAgent" }
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["ExtractorAgent", "WatcherAgent", "EvaluatorAgent", "NotifierAgent"]
+		}
+	]
 }

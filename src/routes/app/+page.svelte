@@ -8,6 +8,11 @@
 	let busy = $state(false);
 	let chatkitReady = $state(false);
 	let mode = $state<'agents' | 'chatkit'>('agents');
+	let pendingDecision = $state<{
+		decisionId: string;
+		assumptionIds: string[];
+		assumptions: { id: string; statement: string }[];
+	} | null>(null);
 
 	onMount(() => {
 		if (data.chatkitWorkflowId) mode = 'chatkit';
@@ -34,19 +39,56 @@
 		if (!message.trim() || busy) return;
 		busy = true;
 		reply = '';
+		pendingDecision = null;
 		try {
 			const res = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ message })
 			});
-			const json = (await res.json()) as { text?: string; error?: string };
+			const json = (await res.json()) as {
+				text?: string;
+				error?: string;
+				decision?: { id: string; statement: string };
+				assumptions?: { id: string; statement: string }[];
+			};
 			if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
 			reply = json.text || 'OK';
 			message = '';
+			if (json.decision && json.assumptions?.length) {
+				pendingDecision = {
+					decisionId: json.decision.id,
+					assumptionIds: json.assumptions.map((a) => a.id),
+					assumptions: json.assumptions
+				};
+				return;
+			}
 			location.reload();
 		} catch (err) {
 			reply = err instanceof Error ? err.message : 'Request failed';
+		} finally {
+			busy = false;
+		}
+	}
+
+	async function confirmDecision() {
+		if (!pendingDecision || busy) return;
+		busy = true;
+		try {
+			const res = await fetch('/api/decisions/confirm', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					decisionId: pendingDecision.decisionId,
+					assumptionIds: pendingDecision.assumptionIds
+				})
+			});
+			const json = (await res.json()) as { text?: string; error?: string };
+			if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+			reply = json.text || 'Tracking.';
+			pendingDecision = null;
+		} catch (err) {
+			reply = err instanceof Error ? err.message : 'Confirm failed';
 		} finally {
 			busy = false;
 		}
@@ -107,6 +149,29 @@
 				</button>
 				{#if reply}
 					<pre class="mt-4 whitespace-pre-wrap rounded-2xl bg-black/40 p-4 text-sm text-sky-100">{reply}</pre>
+				{/if}
+				{#if pendingDecision}
+					<ul class="mt-3 space-y-1 text-sm text-white/70">
+						{#each pendingDecision.assumptions as assumption}
+							<li>• {assumption.statement}</li>
+						{/each}
+					</ul>
+					<div class="mt-3 flex gap-2">
+						<button
+							class="rounded-full bg-emerald-400 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-50"
+							disabled={busy}
+							onclick={confirmDecision}
+						>
+							Track them
+						</button>
+						<button
+							class="rounded-full bg-white/10 px-4 py-2 text-sm"
+							disabled={busy}
+							onclick={() => (pendingDecision = null)}
+						>
+							Skip
+						</button>
+					</div>
 				{/if}
 			{/if}
 		</section>

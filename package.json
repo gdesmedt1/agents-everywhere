@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "wrangler types && vite build",
+		"build": "wrangler types && vite build && node scripts/export-durable-objects.mjs",
 		"preview": "wrangler dev --port 4173",
 		"deploy": "pnpm run build && wrangler deploy",
 		"prepare": "svelte-kit sync || echo ''",
@@ -57,6 +57,7 @@
 	},
 	"dependencies": {
 		"@openai/agents": "^0.18.0",
+		"agents": "^0.23.0",
 		"openai": "^7.15.0",
 		"zod": "^4.6.2"
 	}
