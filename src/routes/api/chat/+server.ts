@@ -13,23 +13,29 @@ export const POST: RequestHandler = async (event) => {
 	const body = (await event.request.json()) as { message?: string };
 	if (!body.message?.trim()) return json({ error: 'message required' }, { status: 400 });
 
-	const result = await runEverywhereAgent({
-		message: body.message,
-		openaiApiKey: apiKey,
-		userLabel: event.locals.user.name || event.locals.user.email
-	});
-
-	const db = getDb(event.platform!.env.DB);
-	for (const draft of result.drafts) {
-		await db.insert(actionDraft).values({
-			userId: event.locals.user.id,
-			kind: draft.kind,
-			title: draft.title,
-			payloadJson: JSON.stringify(draft.payload),
-			status: 'pending',
-			source: 'web'
+	try {
+		const result = await runEverywhereAgent({
+			message: body.message,
+			openaiApiKey: apiKey,
+			userLabel: event.locals.user.name || event.locals.user.email
 		});
-	}
 
-	return json(result);
+		const db = getDb(event.platform!.env.DB);
+		for (const draft of result.drafts) {
+			await db.insert(actionDraft).values({
+				userId: event.locals.user.id,
+				kind: draft.kind,
+				title: draft.title,
+				payloadJson: JSON.stringify(draft.payload),
+				status: 'pending',
+				source: 'web'
+			});
+		}
+
+		return json(result);
+	} catch (err) {
+		const message = err instanceof Error ? err.message : 'Agent failed';
+		const status = /429|credits|quota|billing/i.test(message) ? 402 : 500;
+		return json({ error: message }, { status });
+	}
 };

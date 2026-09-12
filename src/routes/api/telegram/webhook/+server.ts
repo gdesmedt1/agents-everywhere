@@ -95,28 +95,40 @@ export const POST: RequestHandler = async (event) => {
 		return json({ ok: true });
 	}
 
-	const result = await runEverywhereAgent({
-		message: text,
-		openaiApiKey: apiKey
-	});
+	try {
+		const result = await runEverywhereAgent({
+			message: text,
+			openaiApiKey: apiKey
+		});
 
-	for (const draft of result.drafts) {
-		await db.insert(actionDraft).values({
-			userId: linked.userId,
-			kind: draft.kind,
-			title: draft.title,
-			payloadJson: JSON.stringify(draft.payload),
-			status: 'pending',
-			source: 'telegram'
+		for (const draft of result.drafts) {
+			await db.insert(actionDraft).values({
+				userId: linked.userId,
+				kind: draft.kind,
+				title: draft.title,
+				payloadJson: JSON.stringify(draft.payload),
+				status: 'pending',
+				source: 'telegram'
+			});
+		}
+
+		const draftLines = result.drafts.map((d) => `• [${d.kind}] ${d.title}`).join('\n');
+		await telegramSendMessage({
+			token,
+			chatId: update.message.chat.id,
+			text: `${result.text}\n\n${draftLines || '(no drafts)'}\n\nApprove in the web app.`
+		});
+	} catch (err) {
+		const message = err instanceof Error ? err.message : 'Agent failed';
+		const friendly = /429|credits|quota|billing/i.test(message)
+			? 'OpenAI has no credits left on this API key. Top up billing, then try again.'
+			: `Agent error: ${message}`;
+		await telegramSendMessage({
+			token,
+			chatId: update.message.chat.id,
+			text: friendly
 		});
 	}
-
-	const draftLines = result.drafts.map((d) => `• [${d.kind}] ${d.title}`).join('\n');
-	await telegramSendMessage({
-		token,
-		chatId: update.message.chat.id,
-		text: `${result.text}\n\n${draftLines || '(no drafts)'}\n\nApprove in the web app.`
-	});
 
 	return json({ ok: true });
 };
