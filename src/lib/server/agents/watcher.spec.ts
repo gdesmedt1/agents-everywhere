@@ -7,7 +7,11 @@ import { WatcherAgent } from './watcher';
 describe('WatcherAgent.registerAssumption', () => {
 	it('adds a new assumption to state', () => {
 		const agent = Object.create(WatcherAgent.prototype) as WatcherAgent;
-		(agent as any).state = { assumptions: [] };
+		Object.defineProperty(agent, 'state', {
+			value: { assumptions: [] },
+			writable: true,
+			configurable: true
+		});
 		(agent as any).setState = (next: unknown) => {
 			(agent as any).state = next;
 		};
@@ -31,16 +35,20 @@ describe('WatcherAgent.registerAssumption', () => {
 
 	it('is idempotent for the same assumptionId', () => {
 		const agent = Object.create(WatcherAgent.prototype) as WatcherAgent;
-		(agent as any).state = {
-			assumptions: [
-				{
-					decisionId: 'dec_1',
-					decisionStatement: 'Launch Friday',
-					assumptionId: 'asm_1',
-					statement: 'old text'
-				}
-			]
-		};
+		Object.defineProperty(agent, 'state', {
+			value: {
+				assumptions: [
+					{
+						decisionId: 'dec_1',
+						decisionStatement: 'Launch Friday',
+						assumptionId: 'asm_1',
+						statement: 'old text'
+					}
+				]
+			},
+			writable: true,
+			configurable: true
+		});
 		(agent as any).setState = (next: unknown) => {
 			(agent as any).state = next;
 		};
