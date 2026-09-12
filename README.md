@@ -39,6 +39,10 @@ Google OAuth redirect: `${ORIGIN}/api/auth/callback/google`
 
 Scopes: Calendar events + Gmail modify (requested at login).
 
+## Demo dataset
+
+Anonymized workplace replay for content agents: [`datasets/forgex-launch-replay/`](datasets/forgex-launch-replay/). Fictional Apex Labs / ForgeX / Northstar stream. Play `stream.jsonl` in Ambiguous so Assumption Alarm can catch invalidated decisions.
+
 ## Architecture
 
 - **Brain:** `src/lib/server/agent.ts` (`@openai/agents`)
@@ -51,7 +55,7 @@ ChatKit's *custom protocol server* is Python-first. This scaffold does not reimp
 
 ## Deploy notes
 
-Prefer personal Cloudflare account (`gdesmedt1` / Gecko), not Bevy Product. After deploy:
+Prefer the **Assumption Alarm** Cloudflare account (`a412200d80556eb87aeacf16cacb79f5`, Worker `my`), never Bevy Product. Live: https://my.assumption-alarm.workers.dev/app. After deploy:
 
 ```bash
 pnpm exec wrangler secret put OPENAI_API_KEY

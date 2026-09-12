@@ -1,0 +1,66 @@
+{
+  "dataset_id": "forgex-launch-replay-v1",
+  "fictional": true,
+  "channel": {
+    "id": "chan_forgex_collab",
+    "name": "#forgex-launch",
+    "purpose": "Vendor and customer coordinating the ForgeX community go-live"
+  },
+  "orgs": {
+    "apex": {
+      "id": "org_apex",
+      "name": "Apex Labs",
+      "role": "Customer. Software delivery company. Owns ForgeX, the private community for senior engineering leaders."
+    },
+    "northstar": {
+      "id": "org_northstar",
+      "name": "Northstar",
+      "role": "Vendor. Community platform. Implements the ForgeX site, events, emails, and pages."
+    }
+  },
+  "products": {
+    "forgex": "Apex's member community (events, perspectives, discussions, assessments)",
+    "northstar_platform": "The community platform (chapters, events, SiteBlocks pages, system email, SSO)",
+    "siteblocks": "Northstar's newer page framework. Cannot store native form submissions in this story.",
+    "pulsemail": "Apex marketing automation. Owns most member email journeys.",
+    "gatesso": "Apex SSO. Field executives are supposed to log in through it.",
+    "agent_connector": "Northstar's installable agent connector on the community. Optional flavour, not required for the alarm loop."
+  },
+  "urls": {
+    "community": "https://community.forgex.io",
+    "public_domain": "https://forgex.io",
+    "password_reset": "https://community.forgex.io/accounts/password/reset/",
+    "apply": "https://community.forgex.io/pages/apply-now/",
+    "contribute": "https://community.forgex.io/pages/contribute/",
+    "assessment": "https://community.forgex.io/pages/assessment/",
+    "metrics_hub": "https://metrics.forgex.example"
+  },
+  "glossary": [
+    {
+      "term": "chapter",
+      "plain": "The container that hosts events. Customers keep hearing it as a city chapter. Apex has one HQ chapter they want hidden."
+    },
+    {
+      "term": "perspectives",
+      "plain": "Apex's word for blogs, recaps, playbooks. The platform still files them as forum topics."
+    },
+    {
+      "term": "system email vs automated email vs newsletter",
+      "plain": "Three different admin inboxes. System = transactional, not unsubscribable. Automated = triggered campaigns. Newsletter = manual blast from a chapter."
+    },
+    {
+      "term": "create password vs reset password",
+      "plain": "Marketing wants 'create'. The platform screen always says 'reset'. Same flow, two labels."
+    },
+    {
+      "term": "join vs register",
+      "plain": "Admins clicking Join skip the RSVP form and land on the live room. Members should RSVP."
+    }
+  ],
+  "timeline": {
+    "t0": "2026-08-12",
+    "go_live_planned": "2026-09-02",
+    "go_live_actual": "2026-09-03",
+    "t_end": "2026-09-12"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "gold_decisions": [
+    {
+      "id": "D1",
+      "scene": "s1",
+      "decided_at": "evt_014",
+      "text": "Lock member onboarding as: PulseMail announces the new home and links to Create your password. That link opens Northstar's password-reset screen. After they set a password they log in. Migrated members skip Northstar welcome. New applicants get Northstar welcome plus profile nudge.",
+      "assumptions": [
+        {
+          "id": "D1-A1",
+          "text": "PulseMail copy can say Create your password even though the next screen says Reset password, as long as helper text explains the mismatch.",
+          "status_by_end": "weakened",
+          "contradicted_by": ["evt_048"]
+        },
+        {
+          "id": "D1-A2",
+          "text": "Northstar cannot set passwords for migrated or newly approved users. Reset is the only path.",
+          "status_by_end": "holds"
+        },
+        {
+          "id": "D1-A3",
+          "text": "There is no extra Northstar 'you did it' email after password set. Next step is log in. First-login nurture lives in PulseMail.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_033", "evt_049"]
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "scene": "s2",
+      "decided_at": "evt_022",
+      "text": "Until native video-on-demand ships, past webinars go to a YouTube unlisted link, then either a Perspectives recap post or a separate On Demand events area. The live event page does not magically become a blog.",
+      "assumptions": [
+        {
+          "id": "D2-A1",
+          "text": "Native VOD is not ready for this launch, so YouTube is acceptable for MVP.",
+          "status_by_end": "holds"
+        },
+        {
+          "id": "D2-A2",
+          "text": "On Demand can later appear as just another event type filter on the homepage.",
+          "status_by_end": "weakened",
+          "contradicted_by": ["evt_061"]
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "scene": "s3",
+      "decided_at": "evt_028",
+      "text": "Go live with 1-2 discussion posts on the homepage. Perspectives (articles, playbooks, recaps, spotlights) are not the same thing as Discussions.",
+      "assumptions": [
+        {
+          "id": "D3-A1",
+          "text": "The homepage forum widget can be limited to discussions only, not blog topics.",
+          "status_by_end": "weakened",
+          "contradicted_by": ["evt_036"]
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "scene": "s4",
+      "decided_at": "evt_041",
+      "text": "Contributor and apply forms will not be native SiteBlocks forms. Apex supplies PulseMail embeds. Northstar places them on the pages and builds thank-you pages.",
+      "assumptions": [
+        {
+          "id": "D4-A1",
+          "text": "SiteBlocks cannot store native form submissions in time for MVP.",
+          "status_by_end": "holds"
+        },
+        {
+          "id": "D4-A2",
+          "text": "PulseMail thank-you redirects will point at the new community thank-you pages before members use the forms.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_055"]
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "scene": "s5",
+      "decided_at": "evt_052",
+      "text": "Public launch (invites) is Wednesday. Site can go live Tuesday for internal QA, but no member invites until field executives can SSO and the team can log in.",
+      "assumptions": [
+        {
+          "id": "D5-A1",
+          "text": "Field executives are on the SSO allowlist and GateSSO redirect_uri includes forgex.io after domain cutover.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_053", "evt_054"]
+        },
+        {
+          "id": "D5-A2",
+          "text": "Member upload completes before the PulseMail send.",
+          "status_by_end": "holds",
+          "weakened_by": ["evt_058"]
+        }
+      ]
+    },
+    {
+      "id": "D6",
+      "scene": "s6",
+      "decided_at": "evt_057",
+      "text": "Soft launch to 200-250 inactive members first. Company and social launch the next day. Second touch the day after, split active vs inactive.",
+      "assumptions": [
+        {
+          "id": "D6-A1",
+          "text": "Apex can pull a timely list of who reset their password vs who has not, with timestamps.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_038", "evt_072", "evt_076"]
+        }
+      ]
+    },
+    {
+      "id": "D7",
+      "scene": "s7",
+      "decided_at": "evt_078",
+      "text": "Success for roadshow days is one cohesive view: new logins, new applicants (PulseMail), event registrations. Do not make the team stitch five admin reports.",
+      "assumptions": [
+        {
+          "id": "D7-A1",
+          "text": "Logged-in users in analytics means people who reset a password and actively logged in, excluding vendor staff.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_074", "evt_075"]
+        },
+        {
+          "id": "D7-A2",
+          "text": "Event registration reports exclude test events by default.",
+          "status_by_end": "contradicted",
+          "contradicted_by": ["evt_073"]
+        }
+      ]
+    }
+  ],
+  "demo_priority": ["D1", "D5", "D7", "D4"]
+}
