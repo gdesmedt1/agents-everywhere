@@ -46,3 +46,67 @@ export async function sendChatMessage(env: AmbiguousEnv, channelId: string, cont
 		body: JSON.stringify({ content })
 	});
 }
+
+export async function findOrCreateWikiSpace(env: AmbiguousEnv, slug: string, name: string): Promise<{ id: string }> {
+	try {
+		const existing = await ambiguousFetch<{ id: string }>(env, `/api/wiki/spaces/${slug}`);
+		return { id: existing.id };
+	} catch (err) {
+		if (!(err instanceof Error) || !err.message.includes('404')) throw err;
+		const created = await ambiguousFetch<{ id: string }>(env, '/api/wiki/spaces', {
+			method: 'POST',
+			body: JSON.stringify({ name, slug })
+		});
+		return { id: created.id };
+	}
+}
+
+export async function findOrCreateDecisionLogDatabase(
+	env: AmbiguousEnv,
+	spaceId: string
+): Promise<{ pageId: string; databaseId: string }> {
+	const page = await ambiguousFetch<{ id: string }>(env, `/api/wiki/spaces/${spaceId}/pages`, {
+		method: 'POST',
+		body: JSON.stringify({ title: 'Assumption Alarm — Decision Log' })
+	});
+	const database = await ambiguousFetch<{ id: string }>(env, '/api/wiki/databases', {
+		method: 'POST',
+		body: JSON.stringify({
+			page_id: page.id,
+			name: 'decision_log',
+			title: 'Decision Log',
+			schema: {
+				Decision: { type: 'text' },
+				'Reason(s)': { type: 'text' },
+				Assumption: { type: 'text' },
+				Status: { type: 'select', options: ['active', 'invalidated', 'dismissed'] },
+				Confidence: { type: 'number' },
+				'Last evidence': { type: 'text' }
+			}
+		})
+	});
+	return { pageId: page.id, databaseId: database.id };
+}
+
+export async function createDatabaseRow(
+	env: AmbiguousEnv,
+	databaseId: string,
+	properties: Record<string, unknown>
+): Promise<{ id: string }> {
+	return ambiguousFetch(env, `/api/wiki/databases/${databaseId}/rows`, {
+		method: 'POST',
+		body: JSON.stringify({ properties })
+	});
+}
+
+export async function updateDatabaseRow(
+	env: AmbiguousEnv,
+	databaseId: string,
+	rowId: string,
+	properties: Record<string, unknown>
+): Promise<void> {
+	await ambiguousFetch(env, `/api/wiki/databases/${databaseId}/rows/${rowId}`, {
+		method: 'PATCH',
+		body: JSON.stringify({ properties })
+	});
+}
