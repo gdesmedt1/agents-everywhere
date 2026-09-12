@@ -1,12 +1,18 @@
 import { json } from '@sveltejs/kit';
-import { getAgentByName } from 'agents';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { runEverywhereAgent } from '$lib/server/agent';
 import { getDb } from '$lib/server/db';
 import { actionDraft } from '$lib/server/db/schema';
 import { looksLikeDecision } from '$lib/server/decision-heuristic';
-import type { ExtractorAgent } from '$lib/server/agents/extractor';
+import { getAgentByName } from '$lib/server/get-agent-by-name';
+
+type ExtractorStub = {
+	extract: (message: string) => Promise<{
+		decision: unknown;
+		assumptions: unknown[];
+	}>;
+};
 
 export const POST: RequestHandler = async (event) => {
 	if (!event.locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,7 +27,7 @@ export const POST: RequestHandler = async (event) => {
 			const extractor = (await getAgentByName(
 				event.platform!.env.Extractor as any,
 				crypto.randomUUID()
-			)) as unknown as ExtractorAgent;
+			)) as unknown as ExtractorStub;
 			const { decision, assumptions } = await extractor.extract(body.message);
 			return json({
 				text: `I found a decision with ${assumptions.length} condition(s) that appear important. Should I track them?`,
