@@ -20,6 +20,11 @@
 		}
 	],
 	"vars": {
-		"ORIGIN": "https://my.assumption-alarm.workers.dev"
+		"ORIGIN": "https://my.assumption-alarm.workers.dev",
+		"OPENAI_API_KEY": "",
+		"OPENAI_CHATKIT_WORKFLOW_ID": "",
+		"OPENAI_CHATKIT_DOMAIN_KEY": "domain_pk_localhost",
+		"TELEGRAM_BOT_TOKEN": "",
+		"TELEGRAM_WEBHOOK_SECRET": ""
 	}
 }
