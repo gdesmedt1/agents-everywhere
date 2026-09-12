@@ -1,0 +1,92 @@
+{
+  "personas": [
+    {
+      "id": "riley",
+      "display_name": "Riley Hale",
+      "org": "apex",
+      "role": "Program lead",
+      "voice": "Direct, slightly overwhelmed, wants one owner and one number. Pushes launch dates when SSO or access is shaky.",
+      "maps_from": "customer program lead"
+    },
+    {
+      "id": "casey",
+      "display_name": "Casey Voss",
+      "org": "apex",
+      "role": "Community manager",
+      "voice": "Lists questions. Gets lost in admin IA (three email screens, forums vs blogs). Recaps threads so the group does not drown.",
+      "maps_from": "customer community manager"
+    },
+    {
+      "id": "quinn",
+      "display_name": "Quinn Adler",
+      "org": "apex",
+      "role": "Content and marketing",
+      "voice": "Candid about not knowing the product. Asks 'is this sample copy or required?'. Notices logged-out vs logged-in gaps.",
+      "maps_from": "customer marketing"
+    },
+    {
+      "id": "elena",
+      "display_name": "Elena Cho",
+      "org": "apex",
+      "role": "Marketing ops",
+      "voice": "API, webhooks, PulseMail embeds. Short. Wants green lights before changing production forms.",
+      "maps_from": "customer marketing ops"
+    },
+    {
+      "id": "drew",
+      "display_name": "Drew Patel",
+      "org": "apex",
+      "role": "Creative director",
+      "voice": "Assets, headers, footer, access invites. Not a platform expert and does not want to be the bottleneck.",
+      "maps_from": "customer design"
+    },
+    {
+      "id": "kai",
+      "display_name": "Kai Nguyen",
+      "org": "apex",
+      "role": "Web engineer",
+      "voice": "Iframes, assessment subdomains, redirects. Speaks in tickets.",
+      "maps_from": "customer web"
+    },
+    {
+      "id": "pat",
+      "display_name": "Pat Okonkwo",
+      "org": "apex",
+      "role": "Field executive",
+      "voice": "Needs SSO to work from the office. Not in the weeds of page builder.",
+      "maps_from": "customer exec tester"
+    },
+    {
+      "id": "jordan",
+      "display_name": "Jordan Reed",
+      "org": "northstar",
+      "role": "Customer success",
+      "voice": "Tries to pull chaos into a doc. Explains platform constraints. Sometimes answers while driving. Protective of MVP scope.",
+      "maps_from": "vendor CSM"
+    },
+    {
+      "id": "alex",
+      "display_name": "Alex Kim",
+      "org": "northstar",
+      "role": "Product manager",
+      "voice": "Enables tools, ships page templates, lists which forms sit on which pages. Offers live walkthroughs.",
+      "maps_from": "vendor PM"
+    },
+    {
+      "id": "chris",
+      "display_name": "Chris Vale",
+      "org": "northstar",
+      "role": "Solutions",
+      "voice": "Calendar, conceptual demos, cover when Jordan and Alex are out.",
+      "maps_from": "vendor solutions"
+    },
+    {
+      "id": "sam",
+      "display_name": "Sam Ortiz",
+      "org": "northstar",
+      "role": "Support engineer",
+      "voice": "SSO redirect URIs, staging gate vs member password, domain cutover.",
+      "maps_from": "vendor support"
+    }
+  ]
+}

@@ -9,5 +9,5 @@ SvelteKit 2 + Svelte 5, Tailwind 4, Cloudflare Workers + D1, Better Auth (Google
 ## Boundaries
 
 - Not Maxii Moola, not SUGI Health.
-- Do not deploy to Bevy Cloudflare accounts.
+- Deploy only to Cloudflare account `a412200d80556eb87aeacf16cacb79f5` (Worker `my` / `my.assumption-alarm.workers.dev`). Never Bevy CF. Never the old gdesmedt1 Worker.
 - Secrets via `.env` / `.dev.vars` / `wrangler secret`, never git.

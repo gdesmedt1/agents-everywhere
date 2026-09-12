@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "agents-everywhere",
-	"account_id": "4f7e5d275bbcec61dbe60d03f7e9e159",
+	"name": "my",
+	"account_id": "a412200d80556eb87aeacf16cacb79f5",
 	"compatibility_date": "2026-09-11",
 	"compatibility_flags": ["nodejs_compat", "nodejs_als"],
 	"main": ".svelte-kit/cloudflare/_worker.js",
@@ -15,11 +15,11 @@
 		{
 			"binding": "DB",
 			"database_name": "agents-everywhere",
-			"database_id": "0b0302c9-99a7-4d17-8bf8-8dfe278d8676",
+			"database_id": "bc43a0ef-d076-461b-ab04-ebb0b3d28f6c",
 			"migrations_dir": "drizzle"
 		}
 	],
 	"vars": {
-		"ORIGIN": "https://agents-everywhere.gdesmedt1.workers.dev"
+		"ORIGIN": "https://my.assumption-alarm.workers.dev"
 	}
 }
