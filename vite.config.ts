@@ -2,10 +2,12 @@ import { defineConfig } from 'vitest/config';
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
+import agents from 'agents/vite';
 
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
+		agents(),
 		sveltekit({
 			compilerOptions: {
 				runes: ({ filename }) =>

@@ -16,6 +16,10 @@ interface __BaseEnv_Env {
 	CLOUDFLARE_ACCOUNT_ID: string;
 	CLOUDFLARE_DATABASE_ID: string;
 	CLOUDFLARE_D1_TOKEN: string;
+	Extractor: DurableObjectNamespace /* ExtractorAgent */;
+	Watcher: DurableObjectNamespace /* WatcherAgent */;
+	Evaluator: DurableObjectNamespace /* EvaluatorAgent */;
+	Notifier: DurableObjectNamespace /* NotifierAgent */;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {

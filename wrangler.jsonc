@@ -21,5 +21,19 @@
 	],
 	"vars": {
 		"ORIGIN": "https://agents-everywhere.gdesmedt1.workers.dev"
-	}
+	},
+	"durable_objects": {
+		"bindings": [
+			{ "name": "Extractor", "class_name": "ExtractorAgent" },
+			{ "name": "Watcher", "class_name": "WatcherAgent" },
+			{ "name": "Evaluator", "class_name": "EvaluatorAgent" },
+			{ "name": "Notifier", "class_name": "NotifierAgent" }
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["ExtractorAgent", "WatcherAgent", "EvaluatorAgent", "NotifierAgent"]
+		}
+	]
 }
