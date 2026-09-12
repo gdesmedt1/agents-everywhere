@@ -23,6 +23,14 @@ export async function telegramSendMessage(opts: TelegramSendOpts) {
 	return res.json();
 }
 
+export async function telegramAnswerCallbackQuery(token: string, callbackQueryId: string, text?: string) {
+	await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ callback_query_id: callbackQueryId, text })
+	});
+}
+
 export async function telegramSetWebhook(token: string, url: string, secret?: string) {
 	const res = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
 		method: 'POST',

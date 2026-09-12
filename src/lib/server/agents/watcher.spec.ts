@@ -11,10 +11,11 @@ import { describe, it, expect, vi } from 'vitest';
 // class avoids that crash entirely.
 vi.mock('agents', () => ({
 	Agent: class {},
-	callable: () => (_target: unknown, _key: unknown, descriptor: PropertyDescriptor) => descriptor
+	callable: () => (_target: unknown, _key: unknown, descriptor: PropertyDescriptor) => descriptor,
+	getAgentByName: vi.fn()
 }));
 
-import { WatcherAgent } from './watcher';
+import { WatcherAgent, isPlausibleEvidence, type RegisteredAssumption } from './watcher';
 
 describe('WatcherAgent.registerAssumption', () => {
 	it('adds a new assumption to state', () => {
@@ -74,5 +75,37 @@ describe('WatcherAgent.registerAssumption', () => {
 
 		expect((agent as any).state.assumptions).toHaveLength(1);
 		expect((agent as any).state.assumptions[0].statement).toBe('new text');
+	});
+});
+
+describe('isPlausibleEvidence', () => {
+	const assumptions: RegisteredAssumption[] = [
+		{
+			decisionId: 'dec_1',
+			decisionStatement: 'Launch the pricing page Friday',
+			assumptionId: 'asm_1',
+			statement: 'Legal approval completed by Wednesday'
+		},
+		{
+			decisionId: 'dec_1',
+			decisionStatement: 'Launch the pricing page Friday',
+			assumptionId: 'asm_2',
+			statement: 'Payments testing complete before launch'
+		}
+	];
+
+	it('matches evidence sharing significant words with an assumption', () => {
+		const matches = isPlausibleEvidence('Legal approval slipped to Thursday.', assumptions);
+		expect(matches.map((a) => a.assumptionId)).toEqual(['asm_1']);
+	});
+
+	it('returns no matches for unrelated evidence', () => {
+		const matches = isPlausibleEvidence('The office coffee machine is broken.', assumptions);
+		expect(matches).toEqual([]);
+	});
+
+	it('can match more than one assumption', () => {
+		const matches = isPlausibleEvidence('Legal approval and payments testing both slipped.', assumptions);
+		expect(matches.map((a) => a.assumptionId).sort()).toEqual(['asm_1', 'asm_2']);
 	});
 });

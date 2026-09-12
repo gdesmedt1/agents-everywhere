@@ -9,8 +9,8 @@ import { getAgentByName } from '$lib/server/get-agent-by-name';
 
 type ExtractorStub = {
 	extract: (message: string) => Promise<{
-		decision: unknown;
-		assumptions: unknown[];
+		decision: { id: string; statement: string };
+		assumptions: { id: string; statement: string }[];
 	}>;
 };
 
@@ -23,11 +23,11 @@ export const POST: RequestHandler = async (event) => {
 	if (!body.message?.trim()) return json({ error: 'message required' }, { status: 400 });
 
 	if (looksLikeDecision(body.message)) {
+		const workersEnv = event.platform?.env;
+		if (!workersEnv) return json({ error: 'Workers platform unavailable' }, { status: 500 });
 		try {
-			const extractor = (await getAgentByName(
-				event.platform!.env.Extractor as any,
-				crypto.randomUUID()
-			)) as unknown as ExtractorStub;
+			const decisionId = crypto.randomUUID();
+			const extractor = await getAgentByName<ExtractorStub>(workersEnv.Extractor, decisionId);
 			const { decision, assumptions } = await extractor.extract(body.message);
 			return json({
 				text: `I found a decision with ${assumptions.length} condition(s) that appear important. Should I track them?`,

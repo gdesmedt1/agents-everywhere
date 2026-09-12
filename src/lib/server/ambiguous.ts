@@ -20,17 +20,17 @@ async function ambiguousFetch<T>(env: AmbiguousEnv, path: string, init: RequestI
 	});
 	if (!res.ok) {
 		const body = await res.text();
-		throw new Error(`Ambiguous request failed: ${res.status} ${body}`);
+		throw new Error(`Ambiguous request failed: ${res.status} ${body}`, { cause: res.status });
 	}
 	return res.json() as Promise<T>;
 }
 
 export async function pollNotifications(env: AmbiguousEnv): Promise<AmbiguousNotification[]> {
-	const result = await ambiguousFetch<{ notifications: AmbiguousNotification[] }>(
+	const result = await ambiguousFetch<{ notifications?: AmbiguousNotification[] }>(
 		env,
 		'/api/notifications?unread_only=true'
 	);
-	return result.notifications;
+	return result.notifications ?? [];
 }
 
 export async function markNotificationRead(
@@ -52,7 +52,7 @@ export async function findOrCreateWikiSpace(env: AmbiguousEnv, slug: string, nam
 		const existing = await ambiguousFetch<{ id: string }>(env, `/api/wiki/spaces/${slug}`);
 		return { id: existing.id };
 	} catch (err) {
-		if (!(err instanceof Error) || !err.message.includes('404')) throw err;
+		if (!(err instanceof Error) || !err.message.includes('failed: 404')) throw err;
 		const created = await ambiguousFetch<{ id: string }>(env, '/api/wiki/spaces', {
 			method: 'POST',
 			body: JSON.stringify({ name, slug })
@@ -79,7 +79,7 @@ export async function findOrCreateDecisionLogDatabase(
 				Decision: { type: 'text' },
 				'Reason(s)': { type: 'text' },
 				Assumption: { type: 'text' },
-				Status: { type: 'select', options: ['active', 'invalidated', 'dismissed'] },
+				Status: { type: 'select', options: ['pending', 'active', 'invalidated', 'dismissed'] },
 				Confidence: { type: 'number' },
 				'Last evidence': { type: 'text' }
 			}

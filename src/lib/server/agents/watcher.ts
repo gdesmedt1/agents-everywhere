@@ -1,5 +1,10 @@
 import { Agent, callable, getAgentByName } from 'agents';
-import { pollNotifications, markNotificationRead } from '../ambiguous';
+import {
+	pollNotifications,
+	markNotificationRead,
+	findOrCreateWikiSpace,
+	findOrCreateDecisionLogDatabase
+} from '../ambiguous';
 import type { EvaluatorAgent } from './evaluator';
 import type { NotifierAgent } from './notifier';
 import type { ExtractorAgent } from './extractor';
@@ -9,10 +14,12 @@ export type RegisteredAssumption = {
 	decisionStatement: string;
 	assumptionId: string;
 	statement: string;
+	telegramChatId?: string;
 };
 
 export type WatcherState = {
 	assumptions: RegisteredAssumption[];
+	wikiDatabaseId: string | null;
 };
 
 const STOPWORDS = new Set(['the', 'a', 'an', 'is', 'are', 'to', 'by', 'before', 'this', 'and', 'both']);
@@ -43,12 +50,21 @@ export function isPlausibleEvidence(
 const CONFIDENCE_THRESHOLD = 0.7;
 
 export class WatcherAgent extends Agent<Env, WatcherState> {
-	initialState: WatcherState = { assumptions: [] };
+	initialState: WatcherState = { assumptions: [], wikiDatabaseId: null };
 
 	@callable()
 	registerAssumption(input: RegisteredAssumption) {
 		const rest = this.state.assumptions.filter((a) => a.assumptionId !== input.assumptionId);
-		this.setState({ assumptions: [...rest, input] });
+		this.setState({ ...this.state, assumptions: [...rest, input] });
+	}
+
+	@callable()
+	async ensureWikiDatabase(): Promise<string> {
+		if (this.state.wikiDatabaseId) return this.state.wikiDatabaseId;
+		const space = await findOrCreateWikiSpace(this.env, 'assumption-alarm', 'Assumption Alarm');
+		const { databaseId } = await findOrCreateDecisionLogDatabase(this.env, space.id);
+		this.setState({ ...this.state, wikiDatabaseId: databaseId });
+		return databaseId;
 	}
 
 	async onStart() {
@@ -58,16 +74,40 @@ export class WatcherAgent extends Agent<Env, WatcherState> {
 	async poll() {
 		const notifications = await pollNotifications(this.env);
 		for (const n of notifications) {
-			const { was_unread } = await markNotificationRead(this.env, n.notification_id);
-			if (!was_unread) continue;
 			const text = String(n.content.preview ?? n.content.summary ?? '');
-			if (text) await this.dispatchEvidence(text, n.notification_id);
+			if (!text) {
+				await markNotificationRead(this.env, n.notification_id);
+				continue;
+			}
+			try {
+				await this.dispatchEvidence(text, n.notification_id);
+				await markNotificationRead(this.env, n.notification_id);
+			} catch (err) {
+				console.error(`Failed to dispatch evidence ${n.notification_id}; leaving unread for retry`, err);
+			}
 		}
 	}
 
 	@callable()
 	async evaluateNow(evidenceText: string) {
 		await this.dispatchEvidence(evidenceText, `sync:${Date.now()}`);
+	}
+
+	@callable()
+	async applyAssumptionAction(assumptionId: string, action: 'review' | 'update' | 'dismiss') {
+		const match = this.state.assumptions.find((a) => a.assumptionId === assumptionId);
+		if (!match) return;
+		const extractor = (await getAgentByName(
+			this.env.Extractor as any,
+			match.decisionId
+		)) as unknown as ExtractorAgent;
+		await extractor.applyAction(assumptionId, action);
+		if (action === 'dismiss') {
+			this.setState({
+				...this.state,
+				assumptions: this.state.assumptions.filter((a) => a.assumptionId !== assumptionId)
+			});
+		}
 	}
 
 	private async dispatchEvidence(evidenceText: string, evidenceRef: string) {
@@ -101,7 +141,8 @@ export class WatcherAgent extends Agent<Env, WatcherState> {
 					evidenceText,
 					evidenceRef,
 					verdict: result,
-					ambiguousChannelId: this.env.AMBIGUOUS_ALERTS_CHANNEL_ID
+					ambiguousChannelId: this.env.AMBIGUOUS_ALERTS_CHANNEL_ID,
+					telegramChatId: match.telegramChatId
 				});
 			}
 		}

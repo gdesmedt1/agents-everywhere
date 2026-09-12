@@ -3,8 +3,6 @@ import { Agent, tool, run, setDefaultOpenAIKey } from '@openai/agents';
 import { z } from 'zod';
 import type { WatcherAgent } from './watcher';
 import {
-	findOrCreateWikiSpace,
-	findOrCreateDecisionLogDatabase,
 	createDatabaseRow,
 	updateDatabaseRow
 } from '../ambiguous';
@@ -71,6 +69,7 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 	async extract(message: string): Promise<{ decision: Decision; assumptions: Assumption[] }> {
 		let decision: Decision | null = null;
 		let assumptions: Assumption[] = [];
+		const decisionId = this.name?.trim() || crypto.randomUUID();
 
 		const recordDecision = tool({
 			name: 'record_decision',
@@ -78,7 +77,7 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 			parameters: z.object({ statement: z.string(), reasons: z.array(z.string()).min(1).max(5) }),
 			execute: async (args) => {
 				decision = {
-					id: crypto.randomUUID(),
+					id: decisionId,
 					statement: args.statement,
 					reasons: args.reasons.map((text) => ({ id: crypto.randomUUID(), text })),
 					status: 'pending'
@@ -134,25 +133,33 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 	}
 
 	@callable()
-	async confirm(assumptionIds: string[]) {
+	async confirm(
+		assumptionIds: string[] = [],
+		telegramChatId?: string
+	): Promise<{ ok: true; tracked: number } | { ok: false; error: string }> {
+		if (!this.state.decision) return { ok: false, error: 'Decision not found' };
+		const ids =
+			assumptionIds.length > 0
+				? assumptionIds
+				: this.state.assumptions.filter((a) => a.status === 'pending').map((a) => a.id);
 		const assumptions = this.state.assumptions.map((a) =>
-			assumptionIds.includes(a.id) ? { ...a, status: 'active' as const } : a
+			ids.includes(a.id) ? { ...a, status: 'active' as const } : a
 		);
-		const decision = this.state.decision && { ...this.state.decision, status: 'confirmed' as const };
+		const decision = { ...this.state.decision, status: 'confirmed' as const };
 		this.setState({ ...this.state, assumptions, decision });
 
-		if (!decision) return;
 		try {
 			const watcher = (await getAgentByName(this.env.Watcher as any, 'global')) as unknown as WatcherAgent;
 			await this.retry(async () => {
-				for (const id of assumptionIds) {
+				for (const id of ids) {
 					const assumption = assumptions.find((a) => a.id === id);
 					if (!assumption) continue;
 					await watcher.registerAssumption({
 						decisionId: decision.id,
 						decisionStatement: decision.statement,
 						assumptionId: assumption.id,
-						statement: assumption.statement
+						statement: assumption.statement,
+						telegramChatId
 					});
 				}
 			});
@@ -163,12 +170,12 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 		// Decision Log wiki write is visibility, not the source of truth (state above already
 		// has the confirmed assumptions) — a wiki failure must not stop confirmation.
 		try {
-			const space = await findOrCreateWikiSpace(this.env, 'assumption-alarm', 'Assumption Alarm');
-			const { databaseId } = await findOrCreateDecisionLogDatabase(this.env, space.id);
+			const watcher = (await getAgentByName(this.env.Watcher as any, 'global')) as unknown as WatcherAgent;
+			const databaseId = await watcher.ensureWikiDatabase();
 			const wikiRowIds = { ...this.state.wikiRowIds };
-			for (const id of assumptionIds) {
+			for (const id of ids) {
 				const assumption = assumptions.find((a) => a.id === id);
-				if (!assumption) continue;
+				if (!assumption || wikiRowIds[id]) continue;
 				const row = await createDatabaseRow(this.env, databaseId, buildDecisionLogRow(decision, assumption, null));
 				wikiRowIds[id] = row.id;
 			}
@@ -176,6 +183,8 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 		} catch (err) {
 			console.error('Decision Log wiki write failed; assumptions are still confirmed in state', err);
 		}
+
+		return { ok: true, tracked: ids.length };
 	}
 
 	@callable()
@@ -190,7 +199,8 @@ export class ExtractorAgent extends CloudflareAgent<Env, ExtractorState> {
 		}
 		const history = appendVerdict(existing, { ...verdict, assumptionId, evidenceRef });
 		const latest = history[history.length - 1];
-		const isInvalidating = verdict.verdict === 'contradict' || verdict.verdict === 'weaken';
+		const isInvalidating =
+			(verdict.verdict === 'contradict' || verdict.verdict === 'weaken') && verdict.confidence >= 0.7;
 		const assumptions = isInvalidating
 			? this.state.assumptions.map((a) => (a.id === assumptionId ? { ...a, status: 'invalidated' as const } : a))
 			: this.state.assumptions;
