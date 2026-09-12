@@ -118,12 +118,13 @@
 			<a href="#why-it-matters">Why it matters</a>
 		</nav>
 		<a class="pill-button header-cta" href={data.user ? '/app' : '/login'}>
-			{data.user ? 'Open the app' : 'See the demo'}
+			See the demo
 		</a>
 	</header>
 
-	<main class="scroll-track">
+	<div class="scroll-track">
 		<section class="narrative" id="how-it-works" aria-label="How Assumption Alarm works">
+			<p class="ambiguous-signal">Built on Ambiguous · app.ambiguous.ai</p>
 			{#each [
 				{
 					eyebrow: 'DECISION INTELLIGENCE · BUILT FOR TEAMS',
@@ -137,7 +138,7 @@
 					title: 'What if the assumptions change?',
 					body: 'Most tools remember what your team decided. Assumption Alarm remembers what had to remain true — and watches for evidence that it no longer is.',
 					supporting: 'No reminder. No manual check. The agent notices the change itself.',
-					anchor: 'why-it-matters'
+					anchor: undefined
 				},
 				{
 					eyebrow: 'DECISION MAY NEED REVIEW',
@@ -160,8 +161,10 @@
 				</article>
 			{/each}
 		</section>
+	</div>
 
-		<section class="proof" aria-labelledby="proof-title">
+	<main class="landing-sections">
+		<section class="proof section-shell" aria-labelledby="proof-title">
 			<div class="proof-heading">
 				<p class="eyebrow">PRODUCT PROOF</p>
 				<h2 id="proof-title">From decision to clarity.</h2>
@@ -169,24 +172,69 @@
 			</div>
 			<div class="mockup-grid">
 				<article class="mockup-card">
-					<div class="mockup-frame"><span>PRODUCT SCREENSHOT 01</span></div>
+					<div class="mockup-frame"><img src="/landing/decision-capture.png" alt="Decision capture interface" /></div>
 					<p class="mockup-index">01</p>
 					<h3>Capture the decision</h3>
 					<p>A decision is detected and the assumptions behind it are extracted.</p>
 				</article>
 				<article class="mockup-card">
-					<div class="mockup-frame"><span>PRODUCT SCREENSHOT 02</span></div>
+					<div class="mockup-frame"><img src="/landing/decision-workspace.png" alt="Decision workspace interface" /></div>
 					<p class="mockup-index">02</p>
 					<h3>Track what must stay true</h3>
 					<p>Your team confirms the assumptions that make the decision safe.</p>
 				</article>
 				<article class="mockup-card">
-					<div class="mockup-frame"><span>PRODUCT SCREENSHOT 03</span></div>
+					<div class="mockup-frame"><img src="/landing/mobile-alert.png" alt="Mobile assumption alert" /></div>
 					<p class="mockup-index">03</p>
 					<h3>Get alerted when reality changes</h3>
 					<p>New evidence breaks an assumption. The original decision is resurfaced automatically.</p>
 				</article>
 			</div>
+		</section>
+
+		<section class="ecosystem section-shell" id="why-it-matters" aria-labelledby="ecosystem-title">
+			<div class="ecosystem-copy">
+				<p class="eyebrow">WORKS INSIDE REAL TEAM CONTEXT</p>
+				<h2 id="ecosystem-title">Assumption Alarm runs inside Ambiguous.</h2>
+				<p>Decisions, assumptions, alerts, chat, tasks, and agent activity stay connected in one environment — so the right decision gets resurfaced at the right time.</p>
+				<ul>
+					<li>Runs inside app.ambiguous.ai</li>
+					<li>Works across chat, tasks, wiki, and agents</li>
+					<li>Turns changing context into timely action</li>
+				</ul>
+			</div>
+			<div class="ecosystem-visual"><img src="/landing/hero-ambiguous-composite.png" alt="Assumption Alarm working inside Ambiguous" /></div>
+		</section>
+
+		<section class="banner-section section-shell" aria-labelledby="banner-title">
+			<div class="banner-heading">
+				<p class="eyebrow">HOW IT WORKS</p>
+				<h2 id="banner-title">One clear loop. One clear intervention.</h2>
+			</div>
+			<div class="wide-banner"><img src="/landing/from-decision-to-clarity.png" alt="From decision to clarity" /></div>
+		</section>
+
+		<section class="launch section-shell" aria-labelledby="launch-title">
+			<div class="launch-copy">
+				<p class="eyebrow">LAUNCH DEMO</p>
+				<h2 id="launch-title">See Assumption Alarm in action.</h2>
+				<p>This two-minute demo will show the full loop: decision detected, assumptions captured, reality changes, and the original decision resurfaced automatically.</p>
+			</div>
+			<div class="launch-placeholder" aria-label="Launch video placeholder">
+				<div class="play-mark" aria-hidden="true">▶</div>
+				<strong>Launch video coming here</strong>
+				<span>Replace with final hackathon demo video</span>
+			</div>
+			<p class="launch-caption">Best viewed with sound.</p>
+			<a class="pill-button disabled-cta" href="#launch-title" aria-disabled="true">Watch the demo</a>
+		</section>
+
+		<section class="final-cta section-shell" aria-labelledby="final-title">
+			<p class="eyebrow">A CLEARER FUTURE</p>
+			<h2 id="final-title">Better decisions live in clearer context.</h2>
+			<p>Assumption Alarm helps teams remember not just what they decided — but what had to remain true for that decision to still make sense.</p>
+			<a class="pill-button" href={data.user ? '/app' : '/login'}>See the demo <span aria-hidden="true">↗</span></a>
+			<span class="built-by">Built by Team Invariant</span>
 		</section>
 	</main>
 
@@ -370,6 +418,17 @@
 		padding-top: 110px;
 	}
 
+	.ambiguous-signal {
+		position: absolute;
+		top: 104px;
+		left: clamp(32px, 7vw, 110px);
+		margin: 0;
+		color: var(--fg-faint);
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
 	.narrative-panel {
 		position: absolute;
 		top: calc(50% + 38px);
@@ -424,12 +483,21 @@
 		max-width: 390px;
 	}
 
-	.proof {
+	.landing-sections {
 		position: relative;
 		z-index: 3;
+		background: var(--paper);
+	}
+
+	.section-shell {
+		position: relative;
 		max-width: 1180px;
 		margin: 0 auto;
-		padding: 12vh 44px 18vh;
+		padding: 140px 44px;
+	}
+
+	.proof {
+		padding-top: 150px;
 	}
 
 	.proof-heading {
@@ -475,6 +543,13 @@
 		color: var(--fg-faint);
 		font-size: 10px;
 		letter-spacing: 0.14em;
+		overflow: hidden;
+	}
+
+	.mockup-frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.mockup-index {
@@ -498,6 +573,171 @@
 		color: var(--fg-soft);
 		font-size: 14px;
 		line-height: 1.4;
+	}
+
+	.ecosystem {
+		display: grid;
+		grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+		gap: clamp(48px, 9vw, 130px);
+		align-items: center;
+		max-width: 1280px;
+		padding-top: 170px;
+		padding-bottom: 170px;
+	}
+
+	.ecosystem-copy h2,
+	.banner-heading h2,
+	.launch-copy h2,
+	.final-cta h2 {
+		margin: 18px 0 0;
+		font-size: clamp(48px, 6vw, 86px);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.06em;
+		text-wrap: balance;
+	}
+
+	.ecosystem-copy > p:not(.eyebrow),
+	.launch-copy > p:not(.eyebrow),
+	.final-cta > p:not(.eyebrow) {
+		max-width: 470px;
+		margin: 28px 0 0;
+		color: var(--fg-soft);
+		font-size: 17px;
+		line-height: 1.4;
+	}
+
+	.ecosystem-copy ul {
+		margin: 32px 0 0;
+		padding: 0;
+		list-style: none;
+		color: var(--fg-soft);
+		font-size: 14px;
+		line-height: 2;
+	}
+
+	.ecosystem-copy li::before {
+		display: inline-block;
+		width: 8px;
+		height: 8px;
+		margin-right: 12px;
+		border-radius: 50%;
+		background: #dfff00;
+		content: '';
+	}
+
+	.ecosystem-visual,
+	.wide-banner {
+		border: 1px solid var(--rule);
+		border-radius: 18px;
+		background: #eeece8;
+		overflow: hidden;
+	}
+
+	.ecosystem-visual img,
+	.wide-banner img {
+		display: block;
+		width: 100%;
+		height: auto;
+		object-fit: contain;
+	}
+
+	.banner-section {
+		max-width: 1280px;
+		padding-top: 100px;
+		padding-bottom: 170px;
+	}
+
+	.banner-heading {
+		margin-bottom: 48px;
+	}
+
+	.banner-heading h2 {
+		max-width: 720px;
+	}
+
+	.launch {
+		max-width: 980px;
+		padding-top: 150px;
+		padding-bottom: 160px;
+	}
+
+	.launch-copy {
+		max-width: 650px;
+		margin-bottom: 52px;
+	}
+
+	.launch-placeholder {
+		display: flex;
+		aspect-ratio: 16 / 9;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		border: 1px solid var(--rule);
+		border-radius: 18px;
+		background: #e7e4df;
+		color: var(--fg);
+		text-align: center;
+	}
+
+	.play-mark {
+		display: grid;
+		width: 52px;
+		height: 52px;
+		place-items: center;
+		padding-left: 3px;
+		border: 1px solid var(--fg);
+		border-radius: 50%;
+		font-size: 15px;
+	}
+
+	.launch-placeholder strong {
+		margin-top: 12px;
+		font-size: 18px;
+		font-weight: 400;
+	}
+
+	.launch-placeholder span,
+	.launch-caption,
+	.built-by {
+		color: var(--fg-faint);
+		font-size: 12px;
+	}
+
+	.launch-caption {
+		margin: 14px 0 22px;
+	}
+
+	.disabled-cta {
+		cursor: default;
+		opacity: 0.55;
+	}
+
+	.disabled-cta:hover,
+	.disabled-cta:focus-visible {
+		background: var(--pill-bg);
+		color: white;
+		transform: none;
+	}
+
+	.final-cta {
+		max-width: 900px;
+		padding-top: 170px;
+		padding-bottom: 210px;
+	}
+
+	.final-cta h2 {
+		max-width: 760px;
+	}
+
+	.final-cta .pill-button {
+		margin-top: 32px;
+	}
+
+	.built-by {
+		display: block;
+		margin-top: 24px;
 	}
 
 	.site-footer {
@@ -605,6 +845,22 @@
 			padding: 10vh 18px 16vh;
 		}
 
+		.section-shell,
+		.proof,
+		.ecosystem,
+		.banner-section,
+		.launch,
+		.final-cta {
+			padding-right: 18px;
+			padding-left: 18px;
+		}
+
+		.ambiguous-signal {
+			top: 98px;
+			left: 18px;
+			font-size: 9px;
+		}
+
 		.proof-heading {
 			margin-bottom: 38px;
 		}
@@ -612,6 +868,31 @@
 		.mockup-grid {
 			grid-template-columns: 1fr;
 			gap: 42px;
+		}
+
+		.ecosystem {
+			display: block;
+			padding-top: 96px;
+			padding-bottom: 96px;
+		}
+
+		.ecosystem-visual {
+			margin-top: 48px;
+		}
+
+		.banner-section {
+			padding-top: 72px;
+			padding-bottom: 96px;
+		}
+
+		.launch {
+			padding-top: 96px;
+			padding-bottom: 96px;
+		}
+
+		.final-cta {
+			padding-top: 96px;
+			padding-bottom: 140px;
 		}
 
 		.site-footer {
