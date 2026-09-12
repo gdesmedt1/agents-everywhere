@@ -41,7 +41,7 @@ Scopes: Calendar events + Gmail modify (requested at login).
 
 ## Demo dataset
 
-Anonymized workplace replay for content agents: [`datasets/forgex-launch-replay/`](datasets/forgex-launch-replay/). Fictional Apex Labs / ForgeX / Northstar stream. Play `stream.jsonl` in Ambiguous so Assumption Alarm can catch invalidated decisions.
+Anonymized workplace replay for content agents: [`datasets/forgex-launch-replay/`](datasets/forgex-launch-replay/). Human briefing on the Ambiguous wiki: [ForgeX Launch Replay](https://app.ambiguous.ai/wiki/home/forgex-launch-replay). Load JSON/JSONL from this GitHub folder, not from the wiki.
 
 ## Architecture
 
